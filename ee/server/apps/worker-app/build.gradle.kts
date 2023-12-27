@@ -76,6 +76,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:script"))
     implementation(project(":server:libs:modules:components:text-helper"))
     implementation(project(":server:libs:modules:components:twilio"))
+    implementation(project(":server:libs:modules:components:slack"))
 //    implementation(project(":server:libs:modules:components:shopify"))
     implementation(project(":server:libs:modules:components:var"))
     implementation(project(":server:libs:modules:components:xlsx-file"))
