@@ -16,13 +16,14 @@
 
 package com.bytechef.component.slack.action;
 
-import static com.bytechef.component.slack.constant.SlackConstants.DUMMY;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Parameters;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Parameters;
+import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.slack.constant.SlackConstants.DUMMY;
 
 /**
  * @author Mario Cvjetojevic
