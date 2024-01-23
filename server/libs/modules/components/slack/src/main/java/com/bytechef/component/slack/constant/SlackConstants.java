@@ -21,8 +21,9 @@ package com.bytechef.component.slack.constant;
  */
 public final class SlackConstants {
 
-    public static final String EXAMPLE = "slack";
-    public static final String DUMMY = "dummy";
+    public static final String SLACK = "slack";
+    public static final String SEND_MESSAGE = "sendMessage";
+    public static final String SEND_DIRECT_MESSAGE = "sendDirectMessage";
 
     private SlackConstants() {
     }

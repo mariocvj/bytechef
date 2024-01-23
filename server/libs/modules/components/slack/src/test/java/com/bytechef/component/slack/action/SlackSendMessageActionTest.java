@@ -25,13 +25,13 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-public class SlackDummyActionTest {
+public class SlackSendMessageActionTest {
 
     @Test
     public void testPerform() {
         Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertNull(
-            SlackDummyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+            SlackSendMessageAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
     }
 }

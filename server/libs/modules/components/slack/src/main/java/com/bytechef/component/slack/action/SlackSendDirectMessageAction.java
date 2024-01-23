@@ -17,27 +17,26 @@
 package com.bytechef.component.slack.action;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Parameters;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.slack.constant.SlackConstants.DUMMY;
+import static com.bytechef.component.slack.constant.SlackConstants.SEND_MESSAGE;
 
 /**
  * @author Mario Cvjetojevic
  */
-public final class SlackDummyAction {
+public final class SlackSendDirectMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DUMMY)
-        .title("Title")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
+        .title("Send Message")
         .description("Description")
         .properties()
         .outputSchema(string())
-        .perform(SlackDummyAction::perform);
+        .perform(SlackSendDirectMessageAction::perform);
 
-    private SlackDummyAction() {
+    private SlackSendDirectMessageAction() {
     }
 
     public static Object perform(
