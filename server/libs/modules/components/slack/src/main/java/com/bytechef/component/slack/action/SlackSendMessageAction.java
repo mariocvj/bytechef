@@ -19,6 +19,10 @@ package com.bytechef.component.slack.action;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.slack.api.bolt.App;
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.request.chat.ChatPostMessageRequest;
+
+import java.io.IOException;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
@@ -41,9 +45,12 @@ public final class SlackSendMessageAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
+        throws SlackApiException, IOException {
 
         App app = new App();
+
+        app.client().chatPostMessage(ChatPostMessageRequest.builder().build());
 
 
 
