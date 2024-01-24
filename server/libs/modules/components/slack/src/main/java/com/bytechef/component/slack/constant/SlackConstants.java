@@ -24,6 +24,9 @@ public final class SlackConstants {
     public static final String SLACK = "slack";
     public static final String SEND_MESSAGE = "sendMessage";
     public static final String SEND_DIRECT_MESSAGE = "sendDirectMessage";
+    public static final String TEXT = "text";
+    public static final String CHANNEL_ID = "channelId";
+    public static final String USER_ID = "userId";
 
     private SlackConstants() {
     }

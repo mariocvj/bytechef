@@ -21,6 +21,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.SLACK;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.action.SlackSendMessageAction;
 import com.bytechef.component.slack.connection.SlackConnection;
 import com.google.auto.service.AutoService;
@@ -38,7 +39,9 @@ public class SlackComponentHandler implements ComponentHandler {
         .description("Component description.")
         .icon("path:assets/slack.svg")
         .connection(SlackConnection.CONNECTION_DEFINITION)
-        .actions(Collections.singletonList(SlackSendMessageAction.ACTION_DEFINITION));
+        .actions(
+            SlackSendMessageAction.ACTION_DEFINITION,
+            SlackSendDirectMessageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
