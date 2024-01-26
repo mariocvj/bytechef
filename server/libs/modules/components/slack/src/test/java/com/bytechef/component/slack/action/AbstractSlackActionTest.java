@@ -5,10 +5,7 @@ import com.bytechef.component.definition.Parameters;
 import com.slack.api.bolt.App;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import org.junit.jupiter.api.AfterEach;
 import org.mockito.ArgumentCaptor;
-
-import java.io.IOException;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL_ID;
@@ -30,20 +27,17 @@ import static com.bytechef.component.slack.properties.SlackInputProperties.USERN
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AbstractSlackActionTest {
-    protected App mockedApp = mock(App.class);
-    protected MethodsClient mockedMethodsClient = mock(MethodsClient.class);
+    protected static String SEARCH_TEXT = "12345";
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Parameters mockedParameters = mock(Parameters.class);
-    protected ArgumentCaptor<ChatPostMessageRequest> requestArgumentCaptor =
+    protected ArgumentCaptor<ChatPostMessageRequest> chatPostMessageRequestArgumentCaptor =
         ArgumentCaptor.forClass(ChatPostMessageRequest.class);
 
-
-    protected void beforeTestPerform() throws IOException {
+    protected void beforeTestPerform(){
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn(ACCESS_TOKEN);
         when(mockedParameters.getRequiredString(CHANNEL_ID))
@@ -80,20 +74,22 @@ public class AbstractSlackActionTest {
             .thenReturn(USERNAME);
     }
 
-    @AfterEach
-    protected void afterTestPerform() throws IOException {
-        assertEquals(true, requestArgumentCaptor.getValue().getAttachmentsAsString());
-        assertEquals(true, requestArgumentCaptor.getValue().getBlocksAsString());
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-        assertEquals("", requestArgumentCaptor.getValue().);
-
-//        verify(mockedCreate, times(1))
-//            .execute();
+    protected void afterTestPerform(){
+        assertEquals(ACCESS_TOKEN, chatPostMessageRequestArgumentCaptor.getValue().getToken());
+        assertEquals(ATTACHMENTS, chatPostMessageRequestArgumentCaptor.getValue().getAttachmentsAsString());
+        assertEquals(BLOCKS, chatPostMessageRequestArgumentCaptor.getValue().getBlocksAsString());
+        assertEquals(TEXT, chatPostMessageRequestArgumentCaptor.getValue().getText());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isAsUser());
+        assertEquals(ICON_EMOJI, chatPostMessageRequestArgumentCaptor.getValue().getIconEmoji());
+        assertEquals(ICON_URL, chatPostMessageRequestArgumentCaptor.getValue().getIconUrl());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isLinkNames());
+        assertEquals(METADATA, chatPostMessageRequestArgumentCaptor.getValue().getMetadataAsString());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isMrkdwn());
+        assertEquals(PARSE, chatPostMessageRequestArgumentCaptor.getValue().getParse());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isReplyBroadcast());
+        assertEquals(THREAD_TS, chatPostMessageRequestArgumentCaptor.getValue().getThreadTs());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isUnfurlLinks());
+        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue().isUnfurlMedia());
+        assertEquals(USERNAME, chatPostMessageRequestArgumentCaptor.getValue().getUsername());
     }
 }
