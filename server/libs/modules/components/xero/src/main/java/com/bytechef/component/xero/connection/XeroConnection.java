@@ -23,10 +23,9 @@ public class XeroConnection {
                     string(CLIENT_SECRET)
                         .label("Client Secret")
                         .required(true))
-                .authorizationUrl((connection, context) -> "https://xero.com/oauth/authorize")
-                .scopes((connection, context) -> List.of("channels:read", "channels:write", "channels:history",
-                    "chat:write:bot", "groups:read", "reactions:read", "mpim:read","users:read"))
-                .tokenUrl((connection, context) -> "https://xero.com/api/oauth.access"));
+                .authorizationUrl((connection, context) -> "https://login.xero.com/identity/connect/authorize")
+                .scopes((connection, context) -> List.of("accounting.contacts", "accounting.transactions"))
+                .tokenUrl((connection, context) -> "https://identity.xero.com/connect/token"));
 
     private XeroConnection() {
     }
