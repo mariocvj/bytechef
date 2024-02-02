@@ -21,8 +21,35 @@ import com.bytechef.component.definition.Parameters;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
+import static com.bytechef.component.xero.constant.XeroConstants.ADDRESSES;
+import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_NUMBER;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_PERSONS;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_STATUS;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_INVOICE;
+import static com.bytechef.component.xero.constant.XeroConstants.DEFAULT_CURRENCY;
+import static com.bytechef.component.xero.constant.XeroConstants.EMAIL_ADDRESS;
+import static com.bytechef.component.xero.constant.XeroConstants.FIRST_NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.IS_CUSTOMER;
+import static com.bytechef.component.xero.constant.XeroConstants.IS_SUPPLIER;
+import static com.bytechef.component.xero.constant.XeroConstants.LAST_NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.PAYMENT_TEAMS;
+import static com.bytechef.component.xero.constant.XeroConstants.PHONES;
+import static com.bytechef.component.xero.constant.XeroConstants.PURCHASES_DEFAULT_ACCOUNT_CODE;
+import static com.bytechef.component.xero.constant.XeroConstants.PURCHASES_TRACKING_CATEGORIES;
+import static com.bytechef.component.xero.constant.XeroConstants.SALES_DEFAULT_ACCOUNT_CODE;
+import static com.bytechef.component.xero.constant.XeroConstants.SALES_TRACKING_CATEGORIES;
+import static com.bytechef.component.xero.constant.XeroConstants.TAX_NUMBER;
+import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_CATEGORY_NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_OPTION_NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.XERO_NETWORK_KEY;
 
 /**
  * @author Mario Cvjetojevic
@@ -30,7 +57,7 @@ import static com.bytechef.component.xero.constant.XeroConstants.CREATE_INVOICE;
 public final class XeroCreateInvoiceAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_INVOICE)
-        .title("Send Message")
+        .title("Create invoice")
         .description("Description")
         .properties()
         .outputSchema(string())

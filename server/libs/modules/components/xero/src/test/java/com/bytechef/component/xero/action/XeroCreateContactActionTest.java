@@ -22,16 +22,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
+
 /**
  * @author Mario Cvjetojevic
  */
-public class SlackSendMessageActionTest {
+public class XeroCreateContactActionTest {
 
     @Test
-    public void testPerform() {
+    public void testPerform() throws IOException {
         Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertNull(
-            SlackSendMessageAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+            XeroCreateContactAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
     }
 }
