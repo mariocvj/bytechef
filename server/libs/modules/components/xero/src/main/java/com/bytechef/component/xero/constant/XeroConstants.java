@@ -52,6 +52,24 @@ public final class XeroConstants {
     public static final String TRACKING_OPTION_NAME = "trackingOptionName";
     public static final String PAYMENT_TEAMS = "paymentTeams";
 
+    public static final String TYPE = "type";
+    public static final String ACCPAY = "ACCPAY";
+    public static final String ACCREC = "ACCREC";
+    public static final String CONTACT = "CONTACT";
+    public static final String LINE_ITEMS = "LINE_ITEMS";
+    public static final String DRAFT = "DRAFT";
+    public static final String SUBMITTED = "SUBMITTED";
+    public static final String DELETED = "DELETED";
+    public static final String AUTHORISED = "AUTHORISED";
+    public static final String PAID = "PAID";
+    public static final String VOIDED = "VOIDED";
+    public static final String EXCL = "";
+//    public static final String  = "";
+//    public static final String  = "";
+//    public static final String  = "";
+
+
+
 //    public static final String  = "";
 //    public static final String  = "";
 //    public static final String  = "";

@@ -17,16 +17,18 @@
 package com.bytechef.component.xero.action;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.xero.api.ApiClient;
 import com.xero.api.client.AccountingApi;
+import com.xero.api.client.IdentityApi;
 import com.xero.models.accounting.Contact;
 import com.xero.models.accounting.Contacts;
-import com.xero.models.accounting.Phone;
+import com.xero.models.identity.Connection;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -36,26 +38,17 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
-import static com.bytechef.component.xero.constant.XeroConstants.ADDRESSES;
 import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
-import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_NUMBER;
-import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_PERSONS;
-import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_STATUS;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_CONTACT;
-import static com.bytechef.component.xero.constant.XeroConstants.DEFAULT_CURRENCY;
 import static com.bytechef.component.xero.constant.XeroConstants.EMAIL_ADDRESS;
 import static com.bytechef.component.xero.constant.XeroConstants.FIRST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.IS_CUSTOMER;
 import static com.bytechef.component.xero.constant.XeroConstants.IS_SUPPLIER;
 import static com.bytechef.component.xero.constant.XeroConstants.LAST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.NAME;
-import static com.bytechef.component.xero.constant.XeroConstants.PAYMENT_TEAMS;
-import static com.bytechef.component.xero.constant.XeroConstants.PHONES;
 import static com.bytechef.component.xero.constant.XeroConstants.PURCHASES_DEFAULT_ACCOUNT_CODE;
-import static com.bytechef.component.xero.constant.XeroConstants.PURCHASES_TRACKING_CATEGORIES;
 import static com.bytechef.component.xero.constant.XeroConstants.SALES_DEFAULT_ACCOUNT_CODE;
-import static com.bytechef.component.xero.constant.XeroConstants.SALES_TRACKING_CATEGORIES;
 import static com.bytechef.component.xero.constant.XeroConstants.TAX_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_CATEGORY_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_OPTION_NAME;
@@ -76,10 +69,6 @@ public final class XeroCreateContactAction {
                     "Full name of a contact or organisation.")
                 .maxLength(255)
                 .required(true),
-            string(CONTACT_ID)
-                .label("Contact ID")
-                .description(
-                    "Xero identifier."),
             string(CONTACT_NUMBER)
                 .label("Contact number")
                 .description(
@@ -92,10 +81,6 @@ public final class XeroCreateContactAction {
                 .description(
                     "A user defined account number. This can be updated via the API and the Xero UI.")
                 .maxLength(50),
-            string(CONTACT_STATUS)//TODO
-                .label("Contact status")
-                .description(
-                    "Current status of a contact."),
             string(FIRST_NAME)
                 .label("First name")
                 .description(
@@ -116,10 +101,6 @@ public final class XeroCreateContactAction {
                 .description(
                     "Email address of contact person (umlauts not supported). ")
                 .maxLength(255),
-            string(CONTACT_PERSONS)//TODO
-                .label("")
-                .description(
-                    ""),
             string(BANK_ACCOUNT_DETAILS)
                 .label("Bank account details")
                 .description(
@@ -139,14 +120,6 @@ public final class XeroCreateContactAction {
                 .label("Accounts payable tax type")
                 .description(
                     "Default tax type used for contact on AP invoices."),
-            string(ADDRESSES)//TODO
-                .label("Addresses")
-                .description(
-                    "Store certain address types for a contact."),
-            string(PHONES)//TODO
-                .label("Phones")
-                .description(
-                    "Store certain phone types for a contact."),
             bool(IS_SUPPLIER)
                 .label("Is supplier")
                 .description(
@@ -159,30 +132,18 @@ public final class XeroCreateContactAction {
                     "Boolean that describes if a contact has any AR invoices entered against them. Cannot be set " +
                         "via PUT or POST – it is automatically set when an accounts receivable invoice is generated " +
                         "against this contact."),
-            string(DEFAULT_CURRENCY)
-                .label("Default currency")
-                .description(
-                    "Default currency for raising invoices against contact."),
             string(XERO_NETWORK_KEY)
                 .label("Xero network key")
                 .description(
                     "Store XeroNetworkKey for contacts."),
-            string(SALES_DEFAULT_ACCOUNT_CODE)//TODO
+            string(SALES_DEFAULT_ACCOUNT_CODE)
                 .label("Sales default account code")
                 .description(
                     "The default sales account code for contacts."),
-            string(PURCHASES_DEFAULT_ACCOUNT_CODE)//TODO
+            string(PURCHASES_DEFAULT_ACCOUNT_CODE)
                 .label("Purchases default account code")
                 .description(
                     "The default purchases account code for contacts."),
-            string(SALES_TRACKING_CATEGORIES)//TODO
-                .label("Sales tracking categories")
-                .description(
-                    "The default sales tracking categories for contacts."),
-            string(PURCHASES_TRACKING_CATEGORIES)//TODO
-                .label("Purchases tracking categories")
-                .description(
-                    "The default purchases tracking categories for contacts."),
             string(TRACKING_CATEGORY_NAME)
                 .label("Tracking category name")
                 .description(
@@ -192,11 +153,7 @@ public final class XeroCreateContactAction {
                 .label("Tracking option name")
                 .description(
                     "The name of the Tracking Option assigned to the contact under SalesTrackingCategories and " +
-                        "PurchasesTrackingCategories"),
-            string(PAYMENT_TEAMS)//TODO
-                .label("Payment terms")
-                .description(
-                    "The default payment terms for the contact."))
+                        "PurchasesTrackingCategories"))
         .outputSchema(string())
         .perform(XeroCreateContactAction::perform);
 
@@ -207,31 +164,33 @@ public final class XeroCreateContactAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
-        ApiClient defaultClient = new ApiClient();
 
-        AccountingApi apiInstance = AccountingApi.getInstance(defaultClient);
-        String xeroTenantId = "YOUR_XERO_TENANT_ID";
-        String idempotencyKey = "KEY_VALUE";
-        Boolean summarizeErrors = true;
+        Object tenantId = getTenantId(accessToken, actionContext);
 
-        Phone phone = new Phone();
-        phone.setPhoneNumber("555-1212");
-        phone.setPhoneType(com.xero.models.accounting.Phone.PhoneTypeEnum.MOBILE);
+        //Contacts result = apiInstance.createContacts(accessToken, xeroTenantId, contacts, idempotencyKey, true);
 
-        List<Phone> phones = new ArrayList<Phone>();
-        phones.add(phone);
-
-        Contact contact = new Contact();
-        contact.setName("Bruce Banner");
-        contact.setEmailAddress("hulk@avengers.com");
-        contact.setPhones(phones);
-
-        Contacts contacts = new Contacts();
-        contacts.addContactsItem(contact);
-
-        Contacts result = apiInstance.createContacts(accessToken, xeroTenantId, contacts, idempotencyKey, summarizeErrors);
-        System.out.println(result);
+//        actionContext.http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
+//            .body(Context.Http.Body.of(
+//                Map.of(
+//                    "events", Map.of(SUBSCRIBE, true),
+//                    "sources", Map.of(
+//                        "Name", inputParameters.getRequiredString(NAME)
+//                    ))))
+//            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+//            .execute()
+//            .getBody(new Context.TypeReference<>() {});
 
         return null;
+    }
+
+    private static Object getTenantId(String accesToken, ActionContext context){
+        return context.http(http -> http.post("https://api.xero.com/connections"))
+            .body(Context.Http.Body.of(
+                Map.of(
+                    "Authorization", "Bearer " + accesToken,
+                    "Content-Type", "application/json")))
+            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
     }
 }
