@@ -22,6 +22,7 @@ package com.bytechef.component.xero.constant;
 public final class XeroConstants {
 
     public static final String XERO = "xero";
+    public static final String TENANT_ID = "tenantId";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_INVOICE = "createInvoice";
     public static final String NAME = "name";
