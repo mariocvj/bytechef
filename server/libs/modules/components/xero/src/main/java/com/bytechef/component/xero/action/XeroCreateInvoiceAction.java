@@ -17,6 +17,7 @@
 package com.bytechef.component.xero.action;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
@@ -28,17 +29,31 @@ import com.xero.models.accounting.Invoices;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.xero.connection.XeroConnection.getTenantId;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
+import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_INVOICE;
+import static com.bytechef.component.xero.constant.XeroConstants.DEFAULT_CURRENCY;
+import static com.bytechef.component.xero.constant.XeroConstants.EMAIL_ADDRESS;
+import static com.bytechef.component.xero.constant.XeroConstants.FIRST_NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.LAST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEMS;
+import static com.bytechef.component.xero.constant.XeroConstants.NAME;
+import static com.bytechef.component.xero.constant.XeroConstants.TAX_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 
@@ -110,24 +125,27 @@ public final class XeroCreateInvoiceAction {
     }
 
     public static List<Option<String>> getContactOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        String accessToken = "YOUR_ACCESS_TOKEN";
-        ApiClient defaultClient = new ApiClient();
+        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
+        Map<String, String> bodyMap = new HashMap<>();
 
-        AccountingApi apiInstance = AccountingApi.getInstance(defaultClient);
-        String xeroTenantId = "YOUR_XERO_TENANT_ID";
+        bodyMap.put("Name", inputParameters.getRequiredString(NAME));
 
-        String order = "Name ASC";
+        Object response = context
+            .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
+            .body(Context.Http.Body.of(bodyMap))
+            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
 
-        Contacts result = apiInstance.getContacts(accessToken, xeroTenantId, null, null, order, null, 1, true, null, null);
+        return null;
 
-        return result.getContacts()
-            .stream()
-            .filter(contact -> StringUtils.isNotEmpty(searchText) &&
-                StringUtils.startsWith(contact.getName(), searchText))
-            .map(contact -> (Option<String>) option(contact.getName(), contact.getContactID().toString()))
-            .toList();
+//        return response.getContacts()
+//            .stream()
+//            .filter(contact -> StringUtils.isNotEmpty(searchText) &&
+//                StringUtils.startsWith(contact.getName(), searchText))
+//            .map(contact -> (Option<String>) option(contact.getName(), contact.getContactID().toString()))
+//            .toList();
     }
 }

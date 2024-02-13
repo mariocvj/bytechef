@@ -20,11 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
-import javax.naming.AuthenticationException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
@@ -33,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.xero.connection.XeroConnection.getTenantId;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
@@ -160,7 +157,7 @@ public final class XeroCreateContactAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
         Map<String, String> bodyMap = new HashMap<>();
@@ -176,15 +173,10 @@ public final class XeroCreateContactAction {
         putIfNotNull(bodyMap, "AccountsPayableTaxType", inputParameters.getString(ACCOUNTS_PAYABLE_TAX_TYPE));
         putIfNotNull(bodyMap, "DefaultCurrency", inputParameters.getString(DEFAULT_CURRENCY));
 
-        //Contacts result = apiInstance.createContacts(accessToken, xeroTenantId, contacts, idempotencyKey, true);
-
         Object response = actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
-            .body(
-                Context.Http.Body.of(bodyMap))
+            .body(Context.Http.Body.of(bodyMap))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .header(AUTHORIZATION, "OAuth " + accessToken)
-            .header("Xero-tenant-id", getTenantId(accessToken, actionContext))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
@@ -195,32 +187,5 @@ public final class XeroCreateContactAction {
         if (value != null) {
             map.put(key, value);
         }
-    }
-
-    private static String getTenantId(String accesToken, ActionContext context) {
-        Context.Http.Response response = context
-            .http(http -> http.get("https://api.xero.com/connections"))
-            .body(
-                Context.Http.Body.of(
-                    Map.of(
-                        "Authorization", "Bearer " + accesToken,
-                        "Content-Type", "application/json")))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .execute();
-
-        Object body = response.getBody();
-        if (body instanceof LinkedHashMap<?,?>){
-            return ((LinkedHashMap<String,String>) body).get("tenantId");
-        }
-
-        if (body instanceof ArrayList<?>){
-            ArrayList<Object> tenantList = (ArrayList) response.getBody();
-
-            if (tenantList.get(0) instanceof LinkedHashMap<?,?>) {
-                return ((LinkedHashMap<String, String>) tenantList.get(0)).get("tenantId");
-            }
-        }
-        //throw new AuthenticationException();
-        return null;
     }
 }
