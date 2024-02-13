@@ -177,6 +177,8 @@ public final class XeroCreateContactAction {
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
             .body(Context.Http.Body.of(bodyMap))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .header(AUTHORIZATION, "Bearer " + accessToken)
+            .header("Xero-tenant-id", getTenantId(accessToken, actionContext))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
