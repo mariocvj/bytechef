@@ -42,7 +42,7 @@ public class XeroConnection {
     private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
         return ofHeaders(
             Map.of(
-                AUTHORIZATION, List.of("OAuth " + connectionParameters.getRequiredString(ACCESS_TOKEN)),
+                AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN)),
                 "Xero-tenant-id", List.of(getTenantId(connectionParameters.getRequiredString(ACCESS_TOKEN), context))
             )
         );

@@ -16,6 +16,10 @@
 
 package com.bytechef.component.xero.constant;
 
+import com.bytechef.component.definition.Property;
+
+import static com.bytechef.component.definition.ComponentDSL.string;
+
 /**
  * @author Mario Cvjetojevic
  */
@@ -25,49 +29,53 @@ public final class XeroConstants {
     public static final String TENANT_ID = "tenantId";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_INVOICE = "createInvoice";
-    public static final String NAME = "name";
-    public static final String CONTACT_ID = "contactId";
-    public static final String CONTACT_NUMBER = "contactNumber";
-    public static final String ACCOUNT_NUMBER = "accountNumber";
-    public static final String CONTACT_STATUS = "contactStatus";
-    public static final String FIRST_NAME = "firstName";
-    public static final String LAST_NAME = "lastName";
-    public static final String COMPANY_NUMBER = "companyNumber";
-    public static final String EMAIL_ADDRESS = "emailAddress";
-    public static final String CONTACT_PERSONS = "contactPersons";
-    public static final String BANK_ACCOUNT_DETAILS = "bankAccountDetails";
-    public static final String TAX_NUMBER = "taxNumber";
-    public static final String ACCOUNTS_RECEIVABLE_TAX_TYPE = "accountsReceivableTaxType";
-    public static final String ACCOUNTS_PAYABLE_TAX_TYPE = "accountsPayableTaxType";
-    public static final String ADDRESSES = "addresses";
-    public static final String PHONES = "phones";
-    public static final String IS_SUPPLIER = "isSupplier";
-    public static final String IS_CUSTOMER = "isCustomer";
-    public static final String DEFAULT_CURRENCY = "defaultCurrency";
-    public static final String XERO_NETWORK_KEY = "xeroNetworkKey";
-    public static final String SALES_DEFAULT_ACCOUNT_CODE = "salesDefaultAccountCode";
-    public static final String PURCHASES_DEFAULT_ACCOUNT_CODE = "purchasesDefaultAccountCode";
-    public static final String SALES_TRACKING_CATEGORIES = "salesTrackingCategories";
-    public static final String PURCHASES_TRACKING_CATEGORIES = "purchasesTrackingCategories";
-    public static final String TRACKING_CATEGORY_NAME = "trackingCategoryName";
-    public static final String TRACKING_OPTION_NAME = "trackingOptionName";
-    public static final String PAYMENT_TEAMS = "paymentTeams";
+    public static final String NAME = "Name";
+    public static final String CONTACT_ID = "ContactId";
+    public static final String CONTACT_NUMBER = "ContactNumber";
+    public static final String ACCOUNT_NUMBER = "AccountNumber";
+    public static final String COMPANY_NUMBER = "CompanyNumber";
+    public static final String FIRST_NAME = "FirstName";
+    public static final String LAST_NAME = "LastName";
+    public static final String EMAIL_ADDRESS = "EmailAddress";
+    public static final String BANK_ACCOUNT_DETAILS = "BankAccountDetails";
+    public static final String TAX_NUMBER = "TaxNumber";
+    public static final String ACCOUNTS_RECEIVABLE_TAX_TYPE = "AccountsReceivableTaxType";
+    public static final String ACCOUNTS_PAYABLE_TAX_TYPE = "AccountsPayableTaxType";
+    public static final String IS_SUPPLIER = "IsSupplier";
+    public static final String IS_CUSTOMER = "IsCustomer";
+    public static final String DEFAULT_CURRENCY = "DefaultCurrency";
+    public static final String XERO_NETWORK_KEY = "XeroNetworkKey";
+    public static final String SALES_DEFAULT_ACCOUNT_CODE = "SalesDefaultAccountCode";
+    public static final String PURCHASES_DEFAULT_ACCOUNT_CODE = "PurchasesDefaultAccountCode";
+    public static final String TRACKING_CATEGORY_NAME = "TrackingCategoryName";
+    public static final String TRACKING_OPTION_NAME = "TrackingOptionName";
 
-    public static final String TYPE = "type";
+    public static final String TYPE = "Type";
     public static final String ACCPAY = "ACCPAY";
     public static final String ACCREC = "ACCREC";
     public static final String CONTACT = "CONTACT";
-    public static final String LINE_ITEMS = "LINE_ITEMS";
-    public static final String DRAFT = "DRAFT";
-    public static final String SUBMITTED = "SUBMITTED";
-    public static final String DELETED = "DELETED";
-    public static final String AUTHORISED = "AUTHORISED";
-    public static final String PAID = "PAID";
-    public static final String VOIDED = "VOIDED";
-    public static final String EXCL = "";
-//    public static final String  = "";
-//    public static final String  = "";
-//    public static final String  = "";
+    public static final String LINE_ITEM_DESCRIPTION = "lineItemDescription";
+    public static final String LINE_ITEMS_AMMOUNT = "lineItemsAmmount";
+    public static final String LINE_ITEMS = "lineItems";
+    public static final String LINE_ITEM = "lineItem";
+
+    public static final String DESCRIPTION = "Description";
+    public static final String QUANTITY = "Quantity";
+    public static final String UNIT_AMOUNT = "UnitAmount";
+    public static final String ITEM_CODE = "ItemCode";
+    public static final String ACCOUNT_CODE = "AccountCode";
+    public static final String LINE_ITEM_ID = "LineItemID";
+    public static final String TAX_TYPE = "TaxType";
+    public static final String TAX_AMOUNT = "TaxAmount";
+    public static final String LINE_AMOUNT = "LineAmount";
+
+
+//    public static final Property LINE_ITEM_PROPERTY =
+//
+//        string(OCR_LANGUAGE)
+//            .label("OCR Language")
+//            .description(
+//                "A language hint for OCR processing during image import (ISO 639-1 code).")
 
 
 

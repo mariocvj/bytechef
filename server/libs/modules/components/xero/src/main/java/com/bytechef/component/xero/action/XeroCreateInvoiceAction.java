@@ -21,15 +21,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.xero.api.ApiClient;
-import com.xero.api.client.AccountingApi;
-import com.xero.models.accounting.Contacts;
-import com.xero.models.accounting.Invoice;
-import com.xero.models.accounting.Invoices;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,15 +33,29 @@ import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xero.connection.XeroConnection.getTenantId;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
+import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_INVOICE;
+import static com.bytechef.component.xero.constant.XeroConstants.DESCRIPTION;
+import static com.bytechef.component.xero.constant.XeroConstants.ITEM_CODE;
+import static com.bytechef.component.xero.constant.XeroConstants.LINE_AMOUNT;
+import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEM;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEMS;
+import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEM_ID;
+import static com.bytechef.component.xero.constant.XeroConstants.QUANTITY;
+import static com.bytechef.component.xero.constant.XeroConstants.TAX_AMOUNT;
+import static com.bytechef.component.xero.constant.XeroConstants.TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.TYPE;
-import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
+import static com.bytechef.component.xero.constant.XeroConstants.UNIT_AMOUNT;
+import static com.bytechef.component.xero.util.XeroUtils.getMapFilterNull;
 
 /**
  * @author Mario Cvjetojevic
@@ -64,86 +74,122 @@ public final class XeroCreateInvoiceAction {
                     option(ACCPAY, ACCPAY),
                     option(ACCREC, ACCREC))
                 .required(true),
-            string(CONTACT)
+            string(CONTACT_ID)
                 .label("Contact")
                 .description(
                     "Full name of a contact or organisation.")
-        .options((ActionOptionsFunction<String>) XeroCreateInvoiceAction::getContactOptions)
+                .options((ActionOptionsFunction<String>) XeroCreateInvoiceAction::getContactOptions)
                 .required(true),
-            string(LINE_ITEMS)
+            array(LINE_ITEMS)
                 .label("Line items")
                 .description(
                     "The LineItems collection can contain any number of individual LineItem sub-elements. At least " +
                         "one is required to create a complete Invoice.")
-                .options(
-                    option(ACCPAY, ACCPAY),
-                    option(ACCREC, ACCREC))
-                .required(true))
+                .required(true)
+                .minItems(1)
+                .items(
+                    object(LINE_ITEM)
+                        .properties(
+                            string(DESCRIPTION)
+                                .label("Description")
+                                .description(
+                                    "Description needs to be at least 1 char long. A line item with just a description " +
+                                        "(i.e no unit amount or quantity) can be created by specifying just a Description " +
+                                        "element that contains at least 1 character.")
+                                .maxLength(4000)
+                                .required(true),
+                            string(QUANTITY)
+                                .label("Quantity")
+                                .description("LineItem quantity")
+                                .maxLength(13),
+                            number(UNIT_AMOUNT)
+                                .label("Unit amount")
+                                .description(
+                                    "Lineitem unit amount. By default, unit amount will be rounded to two decimal " +
+                                        "places. You can opt in to use four decimal places by adding the querystring parameter " +
+                                        "unitdp=4 to your query. See the Rounding in Xero guide for more information."),
+                            string(ITEM_CODE)
+                                .label("Item code")
+                                .description(
+                                    "If an item is tracked it means Xero tracks the quantity on hand and value of " +
+                                        "the item. There are stricter business rules around tracked items to facilitate this " +
+                                        "e.g. you can't create a sales invoice for that item if you don't have sufficient " +
+                                        "quantity on hand.")
+                                //.options((ActionOptionsFunction<String>) XeroCreateInvoiceAction::getItemCodeOptions)
+                            ,
+                            string(LINE_ITEM_ID)
+                                .label("Line item ID")
+                                .description(
+                                    "The Xero generated identifier for a LineItem. It is recommended that you include " +
+                                        "LineItemIDs on update requests. If LineItemIDs are not included with line items in " +
+                                        "an update request then the line items are deleted and recreated."),
+                            string(TAX_TYPE)
+                                .label("Tax type")
+                                .description("Used as an override if the default Tax Code for the selected AccountCode " +
+                                    "is not correct"),
+                            number(TAX_AMOUNT)
+                                .label("Tax amount")
+                                .description(
+                                    "The tax amount is auto calculated as a percentage of the line amount (see below) based " +
+                                        "on the tax rate. This value can be overriden if the calculated TaxAmount is " +
+                                        "not correct."),
+                            number(LINE_AMOUNT)
+                                .label("Line amount")
+                                .description(
+                                    "The line amount reflects the discounted price if a DiscountRate has been used i.e " +
+                                        "LineAmount = Quantity * Unit Amount * ((100 – DiscountRate)/100)")
+                                .maxValue(9999999999.99))))
         .outputSchema(string())
         .perform(XeroCreateInvoiceAction::perform);
 
     private XeroCreateInvoiceAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static LinkedHashMap<String,?> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
-        ApiClient defaultClient = new ApiClient();
+        Map<String, Object> bodyMap = new HashMap<>();
 
-        AccountingApi apiInstance = AccountingApi.getInstance(defaultClient);
+        bodyMap.put(TYPE, inputParameters.getRequiredString(TYPE));
+        bodyMap.put("Contact", Map.of("ContactID",inputParameters.getRequiredString(CONTACT_ID)));
+        bodyMap.put("LineItems", getMapFilterNull(
+            DESCRIPTION, "inputParameters.getString(DESCRIPTION)",
+            QUANTITY, "inputParameters.getString(QUANTITY)",
+            UNIT_AMOUNT, "inputParameters.getString(UNIT_AMOUNT)"
+        ));
 
-        String xeroTenantId = "YOUR_XERO_TENANT_ID";
-        String idempotencyKey = "KEY_VALUE";
+        LinkedHashMap<String,?> res = actionContext
+            .http(http -> http.post("https://api.xero.com/api.xro/2.0/Invoices"))
+            .body(Context.Http.Body.of(bodyMap, Context.Http.BodyContentType.JSON))
+            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
 
-        Invoice invoice = new Invoice();
-
-        if (inputParameters.getRequiredString(TYPE).equals(ACCPAY)){
-            invoice.setType(Invoice.TypeEnum.ACCPAY);
-        }else {
-            invoice.setType(Invoice.TypeEnum.ACCREC);
-        }
-        //invoice.setContact();
-        //invoice.setLineItems();
-
-        Invoices invoices = new Invoices();
-        invoices.addInvoicesItem(invoice);
-
-        //Contacts result = apiInstance.createContacts(accessToken, xeroTenantId, contacts, idempotencyKey, true);
-
-        return null;
+        return res;
     }
 
     public static List<Option<String>> getContactOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
-        Map<String, String> bodyMap = new HashMap<>();
-
-        //bodyMap.put("Name", "jajaan");
-
-        Object response = context
+        LinkedHashMap<String,?> response = context
             .http(http -> http.get("https://api.xero.com/api.xro/2.0/Contacts"))
-            //.body(Context.Http.Body.of(bodyMap))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .header(AUTHORIZATION, "Bearer " + accessToken)
-            .header("Xero-tenant-id", getTenantId(accessToken, context))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
-        String jaja = "123456";
+        ArrayList<LinkedHashMap<String,?>> contactList = (ArrayList<LinkedHashMap<String, ?>>) response.get("Contacts");
 
-        String res = response.toString();
+        return contactList
+            .stream()
+            .map(contact -> (Option<String>)
+                option(contact.get("Name").toString(), contact.get("ContactID").toString()))
+            .toList();
+    }
 
-        System.out.println(res);
+    public static List<Option<String>> getItemCodeOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
+        //:todo
         return null;
-
-//        return response.getContacts()
-//            .stream()
-//            .filter(contact -> StringUtils.isNotEmpty(searchText) &&
-//                StringUtils.startsWith(contact.getName(), searchText))
-//            .map(contact -> (Option<String>) option(contact.getName(), contact.getContactID().toString()))
-//            .toList();
     }
 }

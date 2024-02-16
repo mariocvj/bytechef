@@ -21,19 +21,19 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.xero.connection.XeroConnection.getTenantId;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
+import static com.bytechef.component.xero.constant.XeroConstants.COMPANY_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.DEFAULT_CURRENCY;
@@ -49,6 +49,7 @@ import static com.bytechef.component.xero.constant.XeroConstants.TAX_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_CATEGORY_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_OPTION_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.XERO_NETWORK_KEY;
+import static com.bytechef.component.xero.util.XeroUtils.getMapFilterNull;
 
 /**
  * @author Mario Cvjetojevic
@@ -87,7 +88,7 @@ public final class XeroCreateContactAction {
                 .description(
                     "Last name of contact person.")
                 .maxLength(255),
-            string(CONTACT_NUMBER)
+            string(COMPANY_NUMBER)
                 .label("Company Number")
                 .description(
                     "Company registration number.")
@@ -108,14 +109,6 @@ public final class XeroCreateContactAction {
                         "VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which " +
                         "regionalized version of Xero you are using.")
                 .maxLength(50),
-            string(ACCOUNTS_RECEIVABLE_TAX_TYPE)
-                .label("Accounts receivable tax type")
-                .description(
-                    "Default tax type used for contact on AR invoices."),
-            string(ACCOUNTS_PAYABLE_TAX_TYPE)
-                .label("Accounts payable tax type")
-                .description(
-                    "Default tax type used for contact on AP invoices."),
             bool(IS_SUPPLIER)
                 .label("Is supplier")
                 .description(
@@ -128,18 +121,6 @@ public final class XeroCreateContactAction {
                     "Boolean that describes if a contact has any AR invoices entered against them. Cannot be set " +
                         "via PUT or POST – it is automatically set when an accounts receivable invoice is generated " +
                         "against this contact."),
-            string(XERO_NETWORK_KEY)
-                .label("Xero network key")
-                .description(
-                    "Store XeroNetworkKey for contacts."),
-            string(SALES_DEFAULT_ACCOUNT_CODE)
-                .label("Sales default account code")
-                .description(
-                    "The default sales account code for contacts."),
-            string(PURCHASES_DEFAULT_ACCOUNT_CODE)
-                .label("Purchases default account code")
-                .description(
-                    "The default purchases account code for contacts."),
             string(TRACKING_CATEGORY_NAME)
                 .label("Tracking category name")
                 .description(
@@ -150,44 +131,49 @@ public final class XeroCreateContactAction {
                 .description(
                     "The name of the Tracking Option assigned to the contact under SalesTrackingCategories and " +
                         "PurchasesTrackingCategories"))
-        .outputSchema(string())
+        .outputSchema(object()
+            .properties(
+                string(NAME),
+                string(CONTACT_NUMBER),
+                string(ACCOUNT_NUMBER),
+                string(FIRST_NAME),
+                string(LAST_NAME),
+                string(COMPANY_NUMBER),
+                string(EMAIL_ADDRESS),
+                string(BANK_ACCOUNT_DETAILS),
+                string(TAX_NUMBER),
+                bool(IS_SUPPLIER),
+                bool(IS_CUSTOMER),
+                string(TRACKING_CATEGORY_NAME),
+                string(TRACKING_OPTION_NAME)
+            ))
         .perform(XeroCreateContactAction::perform);
 
     private XeroCreateContactAction() {
     }
 
-    public static Object perform(
+    public static LinkedHashMap<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
-        Map<String, String> bodyMap = new HashMap<>();
-
-        bodyMap.put("Name", inputParameters.getRequiredString(NAME));
-        putIfNotNull(bodyMap, "FirstName", inputParameters.getString(FIRST_NAME));
-        putIfNotNull(bodyMap, "LastName", inputParameters.getString(LAST_NAME));
-        putIfNotNull(bodyMap, "EmailAddress", inputParameters.getString(EMAIL_ADDRESS));
-        putIfNotNull(bodyMap, "ContactNumber", inputParameters.getString(CONTACT_NUMBER));
-        putIfNotNull(bodyMap, "BankAccountDetails", inputParameters.getString(BANK_ACCOUNT_DETAILS));
-        putIfNotNull(bodyMap, "TaxNumber", inputParameters.getString(TAX_NUMBER));
-        putIfNotNull(bodyMap, "AccountsReceivableTaxType", inputParameters.getString(ACCOUNTS_RECEIVABLE_TAX_TYPE));
-        putIfNotNull(bodyMap, "AccountsPayableTaxType", inputParameters.getString(ACCOUNTS_PAYABLE_TAX_TYPE));
-        putIfNotNull(bodyMap, "DefaultCurrency", inputParameters.getString(DEFAULT_CURRENCY));
-
-        Object response = actionContext
+        return actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
-            .body(Context.Http.Body.of(bodyMap))
+            .body(Context.Http.Body.of(
+                getMapFilterNull(
+                    NAME, inputParameters.getRequiredString(NAME),
+                    CONTACT_NUMBER, inputParameters.getString(CONTACT_NUMBER),
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME),
+                    COMPANY_NUMBER, inputParameters.getString(COMPANY_NUMBER),
+                    EMAIL_ADDRESS, inputParameters.getString(EMAIL_ADDRESS),
+                    BANK_ACCOUNT_DETAILS, inputParameters.getString(BANK_ACCOUNT_DETAILS),
+                    TAX_NUMBER, inputParameters.getString(TAX_NUMBER),
+                    IS_SUPPLIER, inputParameters.getString(IS_SUPPLIER),
+                    IS_CUSTOMER, inputParameters.getString(IS_CUSTOMER),
+                    TRACKING_CATEGORY_NAME, inputParameters.getString(TRACKING_CATEGORY_NAME),
+                    TRACKING_OPTION_NAME, inputParameters.getString(TRACKING_OPTION_NAME))))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .header(AUTHORIZATION, "Bearer " + accessToken)
-            .header("Xero-tenant-id", getTenantId(accessToken, actionContext))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
-
-        return response;
-    }
-
-    private static void putIfNotNull(Map<String, String> map, String key, String value) {
-        if (value != null) {
-            map.put(key, value);
-        }
+            .getBody(new Context.TypeReference<>() {
+            });
     }
 }
