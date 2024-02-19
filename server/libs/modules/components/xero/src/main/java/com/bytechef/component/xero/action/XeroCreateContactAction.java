@@ -20,35 +20,27 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_PAYABLE_TAX_TYPE;
-import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNTS_RECEIVABLE_TAX_TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.BANK_ACCOUNT_DETAILS;
 import static com.bytechef.component.xero.constant.XeroConstants.COMPANY_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.CREATE_CONTACT;
-import static com.bytechef.component.xero.constant.XeroConstants.DEFAULT_CURRENCY;
 import static com.bytechef.component.xero.constant.XeroConstants.EMAIL_ADDRESS;
 import static com.bytechef.component.xero.constant.XeroConstants.FIRST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.IS_CUSTOMER;
 import static com.bytechef.component.xero.constant.XeroConstants.IS_SUPPLIER;
 import static com.bytechef.component.xero.constant.XeroConstants.LAST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.NAME;
-import static com.bytechef.component.xero.constant.XeroConstants.PURCHASES_DEFAULT_ACCOUNT_CODE;
-import static com.bytechef.component.xero.constant.XeroConstants.SALES_DEFAULT_ACCOUNT_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.TAX_NUMBER;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_CATEGORY_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_OPTION_NAME;
-import static com.bytechef.component.xero.constant.XeroConstants.XERO_NETWORK_KEY;
 import static com.bytechef.component.xero.util.XeroUtils.getMapFilterNull;
 
 /**
@@ -167,13 +159,12 @@ public final class XeroCreateContactAction {
                     EMAIL_ADDRESS, inputParameters.getString(EMAIL_ADDRESS),
                     BANK_ACCOUNT_DETAILS, inputParameters.getString(BANK_ACCOUNT_DETAILS),
                     TAX_NUMBER, inputParameters.getString(TAX_NUMBER),
-                    IS_SUPPLIER, inputParameters.getString(IS_SUPPLIER),
-                    IS_CUSTOMER, inputParameters.getString(IS_CUSTOMER),
+                    IS_SUPPLIER, inputParameters.getBoolean(IS_SUPPLIER),
+                    IS_CUSTOMER, inputParameters.getBoolean(IS_CUSTOMER),
                     TRACKING_CATEGORY_NAME, inputParameters.getString(TRACKING_CATEGORY_NAME),
                     TRACKING_OPTION_NAME, inputParameters.getString(TRACKING_OPTION_NAME))))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {
-            });
+            .getBody(new Context.TypeReference<>() {});
     }
 }

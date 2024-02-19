@@ -6,13 +6,13 @@ import java.util.Map;
 public final class XeroUtils {
 
 
-    public static Map<String, String> getMapFilterNull(String... keyValueArray){
-        Map<String, String> map = new HashMap<>();
+    public static Map<String, Object> getMapFilterNull(Object... keyValueArray){
+        Map<String, Object> map = new HashMap<>();
         String key;
-        String value;
+        Object value;
 
         for (int i = 0; i < keyValueArray.length; i = i + 2) {
-            key = keyValueArray[i];
+            key = keyValueArray[i].toString();
             value = keyValueArray[i+1];
             if (key != null && value != null) {
                 map.put(key, value);

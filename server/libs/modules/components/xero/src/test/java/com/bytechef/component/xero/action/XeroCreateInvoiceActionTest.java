@@ -1,19 +1,3 @@
-/*
- * Copyright 2023-present ByteChef Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.bytechef.component.xero.action;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,10 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Mario Cvjetojevic
- */
-public class XeroCreateContactActionTest {
+public class XeroCreateInvoiceActionTest {
 
     @Test
     public void testPerform() {
@@ -98,10 +79,10 @@ public class XeroCreateContactActionTest {
             .thenReturn(propertyStubsMap.get(TRACKING_OPTION_NAME).toString());
 
         ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Context.Http.Body.class);
-        ArgumentCaptor<Context.ContextFunction> functionArgumentCaptor =
+        ArgumentCaptor<Context.ContextFunction> contextFunctionArgumentCaptor =
             ArgumentCaptor.forClass(Context.ContextFunction.class);
 
-        when(mockedContext.http(functionArgumentCaptor.capture()))
+        when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -117,9 +98,6 @@ public class XeroCreateContactActionTest {
         assertNotNull(result);
         assertEquals(propertyStubsMap, bodyArgumentCaptor.getValue().getContent());
 
-        //todo: somehow check lambda equality
-//        Context.ContextFunction<Context.Http, ?> expectedFunction =
-//            http -> http.post("https://api.xero.com/api.xro/2.0/Contacts");
-//        assertEquals(expectedFunction, functionArgumentCaptor.getValue());
+        Context.ContextFunction function = contextFunctionArgumentCaptor.getValue();//todo: validate this
     }
 }
